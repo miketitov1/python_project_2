@@ -5,15 +5,17 @@ pygame.init()
 
 class Button(pygame.sprite.Sprite):
 
-    def __init__(self, pos, unpressed_button_image, pressed_button_image, handle_event=None):
+    def __init__(self, pos, name, size):
         super().__init__()
         self.pos = pos
-        self.unpressed_button_image = unpressed_button_image
-        self.pressed_button_image = pressed_button_image
-        self.image = self.unpressed_button_image
+
+        self.button_image_pressed = pygame.transform.smoothscale(
+            pygame.image.load(f"menu/images/buttons/{name}_button_pressed.png").convert_alpha(), size)
+        self.button_image_unpressed = pygame.transform.smoothscale(
+            pygame.image.load(f"menu/images/buttons/{name}_button_unpressed.png").convert_alpha(), size)
+        self.image = self.button_image_unpressed
 
         self.rect = self.image.get_rect(center=self.pos)
-        self.handle_event = handle_event
 
     def mouse_button_collision(self):
         mouse_pos_x, mouse_pos_y = pygame.mouse.get_pos()
@@ -24,6 +26,6 @@ class Button(pygame.sprite.Sprite):
 
     def update_image(self):
         if self.mouse_button_collision():
-            self.image = self.pressed_button_image
+            self.image = self.button_image_pressed
         else:
-            self.image = self.unpressed_button_image
+            self.image = self.button_image_unpressed

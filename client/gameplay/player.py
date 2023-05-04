@@ -1,18 +1,19 @@
 import pygame
 import math
 
-from client.gameplay.game_settings import *
+from gameplay.game_settings import *
 
 pygame.init()
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, player_id, pos, facing_angle, image):
+    def __init__(self, player_id, pos, facing_angle):
         super().__init__()
         self.pos = pos
         self.player_id = player_id
-        self.image = image
+        self.image = pygame.transform.smoothscale(pygame.image.load(f"gameplay/images/player_{player_id}.png").convert_alpha(), PLAYER_SIZE)
         self.basic_image = self.image
+        self.status = PLAYER_ALIVE_STATUS
 
         self.hitbox_rect = self.basic_image.get_rect(center=self.pos)
         self.hitbox_rect.centerx -= 10
@@ -31,25 +32,25 @@ class Player(pygame.sprite.Sprite):
 
     def get_input(self):
         keys = pygame.key.get_pressed()
+        if self.status == PLAYER_ALIVE_STATUS:
+            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+                self.facing_angle += ROTATION_SPEED
+                self.facing_angle %= 360
+            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+                self.facing_angle -= ROTATION_SPEED
+                self.facing_angle %= 360
+            if keys[pygame.K_DOWN]:
+                pass
 
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.facing_angle += ROTATION_SPEED
-            self.facing_angle %= 360
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.facing_angle -= ROTATION_SPEED
-            self.facing_angle %= 360
-        if keys[pygame.K_DOWN]:
-            pass
+            if keys[pygame.K_UP] or keys[pygame.K_w]:
+                self.is_accelerating = True
+            else:
+                self.is_accelerating = False
 
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.is_accelerating = True
-        else:
-            self.is_accelerating = False
-
-        if pygame.mouse.get_pressed() == (1, 0, 0) or keys[pygame.K_SPACE]:
-            self.is_shooting = True
-        else:
-            self.is_shooting = False
+            if keys[pygame.K_SPACE]:
+                self.is_shooting = True
+            else:
+                self.is_shooting = False
 
     def update_shoot_cooldown(self):
         if self.shoot_cooldown > 0:

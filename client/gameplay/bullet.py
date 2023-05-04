@@ -1,16 +1,16 @@
 import pygame
 
-from client.gameplay.game_settings import *
+from gameplay.game_settings import *
 
 pygame.init()
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, player_id, pos, direction, image):
+    def __init__(self, player_id, pos, direction):
         super().__init__()
         self.player_id = player_id
         self.pos = pos.copy()
-        self.image = image
+        self.image = pygame.transform.smoothscale(pygame.image.load("gameplay/images/bullet.png").convert_alpha(), BULLET_SIZE)
         self.rect = self.image.get_rect(center=self.pos)
         self.direction = direction
 
