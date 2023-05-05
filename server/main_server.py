@@ -62,41 +62,16 @@ class Server:
                 return new_game_id, invite_code
 
     def handle_data(self, client, addr, data):
-        if data.status == UPDATE_GAME_MESSAGE:
-            content = data.content
-
-            if self.debug_mode:
-                print(f"[RECEIVED] From player {addr} received data {content}")
-
-            game_id = content[0]
-            game_data = content[1]
-            status, server_players_dict, server_bullets_dict = self.games_dict[game_id].update_game(game_data)
-            reply = Message(status, (server_players_dict, server_bullets_dict))
-            self.send_data(client, reply)
-
-            if self.debug_mode:
-                print(f"[SENT] Sent reply {reply.content} to player {addr}")
-
-        elif data.status == CREATE_GAME_MESSAGE:
+        if data.status == CREATE_GAME_MESSAGE:
             new_game_id, invite_code = self.create_new_game(client)
             print(f"[NEW GAME]: Player {addr} created new game {new_game_id} with invite code {invite_code}.")
             reply = Message(None, (new_game_id, invite_code))
             self.send_data(client, reply)
 
-        elif data.status == LEAVE_MESSAGE:
-            game_id, player_id = data.content
-            game = self.games_dict[game_id]
-            game.remove_player(player_id)
-            print(f"[PLAYER LEFT]: Player {addr} left the game {game.game_id}.")
-            if self.games_dict[game_id].is_empty:
-                self.delete_game(game_id)
-
         elif data.status == UPDATE_HOST_MENU_MESSAGE:
             game_id, map_id, rounds_number = data.content
-            #print(f"[RECEIVED]: Received game_id {game_id}, map id {map_id}, rounds number {rounds_number}")
             game = self.games_dict[game_id]
             status, server_players_dict, new_map_id, new_rounds_number = game.update_host_menu(map_id, rounds_number)
-            #print(f"[SENT]: Sending game_id {game_id}, map id {new_map_id}, rounds number {new_rounds_number}")
             reply = Message(status, (server_players_dict, new_map_id, new_rounds_number))
             self.send_data(client, reply)
 
@@ -124,8 +99,36 @@ class Server:
 
         elif data.status == START_GAME_MESSAGE:
             game_id = data.content
-            self.games_dict[game_id].start_game()
-            print(f"[GAME STARTED]: Game {game_id} was started by player {addr}.")
+            self.games_dict[game_id].start(addr)
+
+        elif data.status == UPDATE_GAME_MESSAGE:
+            content = data.content
+            if self.debug_mode:
+                print(f"[RECEIVED] From player {addr} received data {content}")
+            game_id = content[0]
+            game_data = content[1]
+            status, server_players_dict, server_bullets_dict = self.games_dict[game_id].update_game(game_data)
+            reply = Message(status, (server_players_dict, server_bullets_dict))
+            self.send_data(client, reply)
+            if self.debug_mode:
+                print(f"[SENT] Sent reply {reply.content} to player {addr}")
+
+        elif data.status == FINISH_GAME_MESSAGE:
+            content = data.content
+            game_id = content[0]
+            game_data = content[1]
+            status, server_players_dict, server_bullets_dict = self.games_dict[game_id].update_game(game_data)
+            reply = Message(status, (server_players_dict, server_bullets_dict))
+            self.send_data(client, reply)
+            self.games_dict[game_id].finish()
+
+        elif data.status == LEAVE_MESSAGE:
+            game_id, player_id = data.content
+            game = self.games_dict[game_id]
+            game.remove_player(player_id)
+            print(f"[PLAYER LEFT]: Player {addr} left the game {game.game_id}.")
+            if self.games_dict[game_id].is_empty:
+                self.delete_game(game_id)
 
     def safe_disconnect(self, client, addr):
         for game_id, game in self.games_dict.items():

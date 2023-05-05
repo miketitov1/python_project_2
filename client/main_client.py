@@ -47,10 +47,10 @@ class Main:
 
         print("[NEW MENU]: Creating main menu")
 
-    def create_host_menu(self, player_id, game_id, invite_code, hosting):
+    def create_host_menu(self, game_id, invite_code, player_id, hosting):
         self.host_menu = HostMenu(self.screen, self.resize_screen, self.create_main_menu,
                                   self.create_cannot_connect_menu,
-                                  self.create_game, player_id, game_id, invite_code, hosting)
+                                  self.create_game, game_id, invite_code, player_id, hosting)
         self.status = HOST_MENU_STATUS
 
         print("[NEW MENU]: Creating host menu")
@@ -69,8 +69,8 @@ class Main:
 
         print("[NEW MENU]: Creating connection lost menu")
 
-    def create_game(self, game_id, player_id, invite_code, map_id, rounds_number, current_round):
-        self.game = Game(self.screen, self.resize_screen, self.create_pause_menu, self.create_main_menu, self.create_host_menu, self.create_game, game_id, player_id, invite_code, map_id, rounds_number, current_round)
+    def create_game(self, game_id, invite_code, player_id, map_id, rounds_number, current_round):
+        self.game = Game(self.screen, self.resize_screen, self.create_pause_menu, self.create_main_menu, self.create_host_menu, self.create_game, game_id, invite_code, player_id, map_id, rounds_number, current_round)
         self.status = GAME_STATUS
         print(f"[NEW GAME]: Creating game {game_id}")
 

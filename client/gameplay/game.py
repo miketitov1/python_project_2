@@ -17,8 +17,7 @@ NUMBER_SIZE = (84, 147)
 
 class Game:
     def __init__(self, display_surface, resize_screen, create_pause_menu, create_main_menu, create_host_menu,
-                 create_game, game_id, player_id, invite_code, map_id,
-                 rounds_number, current_round):
+                 create_game, game_id, invite_code, player_id, map_id, rounds_number, current_round):
         self.map = map_dict[map_id]
         self.screen_width = len(self.map.level_data) * self.map.tile_size
         self.screen_height = len(self.map.level_data) * self.map.tile_size
@@ -111,13 +110,11 @@ class Game:
 
     def finish_game(self):
         if self.finishing_countdown == 0:
-            print(self.current_round, self.rounds_number)
+            print(f"[DEBUG]: Restarting game...")
             if self.current_round == self.rounds_number:
-                self.create_host_menu(player_id=self.player_id, game_id=self.game_id, invite_code=self.invite_code,
-                                      hosting=False)
+                self.create_host_menu(self.game_id, self.invite_code, self.player_id, hosting=False)
             else:
-                self.create_game(self.game_id, self.player_id, self.invite_code, self.map_id, self.rounds_number,
-                                 self.current_round + 1)
+                self.create_game(self.game_id, self.invite_code, self.player_id, self.map_id, self.rounds_number, self.current_round + 1)
         else:
             self.finishing_countdown -= 1
 
@@ -179,17 +176,19 @@ class Game:
                     player.pos.y = player.hitbox_rect.centery
                     player.speed.y = 0
 
-    def bullets_tiles_collision(self):
+    def my_bullets_collision(self):
         for bullet in self.bullets.sprites():
             for tile in self.tiles.sprites():
                 if bullet.rect.colliderect(tile.rect):
                     bullet.kill()
+            for player in self.other_players_dict.values():
+                if bullet.rect.colliderect(player.sprite.rect):
+                    bullet.kill()
 
-    def bullets_player_collision(self):
+    def other_bullets_collision(self):
         for other_bullets in self.other_bullets_dict.values():
             for other_bullet in other_bullets.sprites():
                 if other_bullet.rect.colliderect(self.player.sprite.hitbox_rect):
-                    other_bullet.kill()
                     self.destroy_player()
 
     def destroy_player(self):
@@ -240,21 +239,25 @@ class Game:
 
     def communication_with_server(self):
         if self.status != LEAVE_GAME_STATUS:
-            message = Message(UPDATE_GAME_MESSAGE, (self.game_id, self.encode_data()))
+            if self.status == GAME_FINISHING_STATUS and self.current_round == self.rounds_number:
+                status = FINISH_GAME_MESSAGE
+            else:
+                status = UPDATE_GAME_MESSAGE
+            message = Message(status, (self.game_id, self.encode_data()))
             network.send_data(message)
 
             if self.debug_mode:
-                print(f"[SENT] Sent data {message.content}")
+                print(f"[SENT]: Sent data {message.content}")
 
             reply = network.receive_data()
-            status = reply.status
             server_players_dict = reply.content[0]
             server_bullets_dict = reply.content[1]
 
             if self.debug_mode:
-                print(f"[RECEIVED] Received data {server_players_dict}, {server_bullets_dict}")
+                print(f"[RECEIVED]: Received data {server_players_dict}, {server_bullets_dict}")
 
             self.decode_data(server_players_dict, server_bullets_dict)
+
         elif self.status == LEAVE_GAME_STATUS:
             message = Message(LEAVE_MESSAGE, (self.game_id, self.player_id))
             network.send_data(message)
@@ -282,27 +285,20 @@ class Game:
             self.player.sprite.get_input()
 
     def check_if_finish(self):
-        if not len(self.other_players_dict) == 0:
-            if self.status == GAME_IN_PROGRESS_STATUS:
-                other_players_alive_counter = 0
-                for player in self.other_players_dict.values():
-                    if player.sprite.status == PLAYER_ALIVE_STATUS:
-                        other_players_alive_counter += 1
-
-                if other_players_alive_counter == 0 or (
-                        self.player.sprite.status == PLAYER_DESTROYED_STATUS and other_players_alive_counter == 1):
-                    self.status = GAME_FINISHING_STATUS
+        if self.status != GAME_STARTING_STATUS and len(self.other_players_dict) == 0 or (self.player.sprite.status == PLAYER_DESTROYED_STATUS and len(self.other_players_dict) == 1):
+            if self.status != GAME_FINISHING_STATUS:
+                print(f"[DEBUG]: Finishing game...")
+                self.status = GAME_FINISHING_STATUS
 
     def update(self):
-        if self.player.sprite.status == PLAYER_ALIVE_STATUS:
-            self.horizontal_movement_and_collision()
-            self.vertical_movement_and_collision()
-            self.bullets_tiles_collision()
-            self.bullets_player_collision()
-            self.shoot()
+        self.horizontal_movement_and_collision()
+        self.vertical_movement_and_collision()
+        self.other_bullets_collision()
+        self.my_bullets_collision()
+        self.shoot()
 
-            self.player.update()
-            self.bullets.update()
+        self.player.update()
+        self.bullets.update()
 
         if self.status != GAME_PAUSED_STATUS:
             self.get_input()

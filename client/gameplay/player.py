@@ -32,25 +32,24 @@ class Player(pygame.sprite.Sprite):
 
     def get_input(self):
         keys = pygame.key.get_pressed()
-        if self.status == PLAYER_ALIVE_STATUS:
-            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-                self.facing_angle += ROTATION_SPEED
-                self.facing_angle %= 360
-            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-                self.facing_angle -= ROTATION_SPEED
-                self.facing_angle %= 360
-            if keys[pygame.K_DOWN]:
-                pass
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            self.facing_angle += ROTATION_SPEED
+            self.facing_angle %= 360
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            self.facing_angle -= ROTATION_SPEED
+            self.facing_angle %= 360
+        if keys[pygame.K_DOWN]:
+            pass
 
-            if keys[pygame.K_UP] or keys[pygame.K_w]:
-                self.is_accelerating = True
-            else:
-                self.is_accelerating = False
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            self.is_accelerating = True
+        else:
+            self.is_accelerating = False
 
-            if keys[pygame.K_SPACE]:
-                self.is_shooting = True
-            else:
-                self.is_shooting = False
+        if keys[pygame.K_SPACE]:
+            self.is_shooting = True
+        else:
+            self.is_shooting = False
 
     def update_shoot_cooldown(self):
         if self.shoot_cooldown > 0:

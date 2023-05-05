@@ -82,7 +82,7 @@ class JoinMenu:
                 self.game_id = int(self.game_id)
                 self.invite_code = int(self.invite_code)
                 player_id = reply.content
-                self.create_host_menu(player_id, self.game_id, self.invite_code, hosting=False)
+                self.create_host_menu(self.game_id, self.invite_code, player_id, hosting=False)
 
     def get_input(self):
         for event in pygame.event.get():

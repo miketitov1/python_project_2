@@ -26,7 +26,7 @@ GAMEMODE_TEAM_DEATHMATCH = "team deathmatch"
 
 class HostMenu:
     def __init__(self, display_surface, resize_screen, create_main_menu, create_connection_lost_menu, create_game,
-                 player_id, game_id, invite_code, hosting):
+                 game_id, invite_code, player_id, hosting):
         self.player_id = player_id
         self.game_id = game_id
         self.invite_code = invite_code
@@ -130,7 +130,7 @@ class HostMenu:
         reply = network.receive_data()
         self.players, self.map_id, self.rounds_number = reply.content
         if reply.status == "in progress":
-            self.create_game(self.game_id, self.player_id, self.invite_code, self.map_id, self.rounds_number, 1)
+            self.create_game(self.game_id, self.invite_code, self.player_id, self.map_id, self.rounds_number, 1)
 
     def update_starting_parameters(self):
         if self.map_selectbox.selected_index != self.map_id or self.round_selectbox.selected_index != self.rounds_number:

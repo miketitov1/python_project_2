@@ -67,7 +67,7 @@ class MainMenu:
                 elif self.host_game_button.mouse_button_collision():
                     self.connect()
                     if network.connected:
-                        self.create_host_menu(player_id=1, game_id=-1, invite_code=-1, hosting=True)
+                        self.create_host_menu(game_id=-1, invite_code=-1, player_id=1, hosting=True)
                 elif self.join_game_button.mouse_button_collision():
                     self.connect()
                     if network.connected:

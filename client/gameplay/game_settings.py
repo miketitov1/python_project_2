@@ -4,7 +4,6 @@ GAME_LOBBY_STATUS = "host lobby"
 GAME_IN_PROGRESS_STATUS = "in progress"
 GAME_STARTING_STATUS = "starting"
 GAME_FINISHING_STATUS = "finishing"
-GAME_FINISHED_STATUS = "finished"
 GAME_PAUSED_STATUS = "paused"
 LEAVE_GAME_STATUS = "leave"
 
