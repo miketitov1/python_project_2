@@ -181,9 +181,9 @@ class Game:
             for tile in self.tiles.sprites():
                 if bullet.rect.colliderect(tile.rect):
                     bullet.kill()
-            for player in self.other_players_dict.values():
-                if bullet.rect.colliderect(player.sprite.rect):
-                    bullet.kill()
+            # for player in self.other_players_dict.values():
+            #     if bullet.rect.colliderect(player.sprite.rect):
+            #        bullet.kill()
 
     def other_bullets_collision(self):
         for other_bullets in self.other_bullets_dict.values():
