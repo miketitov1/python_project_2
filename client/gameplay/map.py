@@ -45,12 +45,12 @@ def setup_maps():
         'X                       X',
         'X   X X           X X   X',
         'X   X       X       X   X',
-        'X       3   X   2       X',
+        'X       3   X     2     X',
         'X                       X',
         'X     X X   X   X X     X',
         'X                       X',
-        'X       1   X   4       X',
-        'X   X       X       X   X',
+        'X           X           X',
+        'X   X   1   X     4 X   X',
         'X   X X           X X   X',
         'X                       X',
         'X X X X X X X X X X X X X']
@@ -77,7 +77,7 @@ def setup_maps():
     level_data_5 = [
         'X X X X X X X X X X X X X',
         'X                       X',
-        'X   2 X X X     X X 3   X',
+        'X   3 X X X     X X   2 X',
         'X     X           X   X X',
         'X X   X           X     X',
         'X           X           X',
@@ -85,8 +85,8 @@ def setup_maps():
         'X     X X X X     X     X',
         'X   X X           X     X',
         'X     X           X X   X',
-        'X   1 X     X X X X 4   X',
-        'X     X                 X',
+        'X   1 X     X X X X     X',
+        'X     X               4 X',
         'X X X X X X X X X X X X X']
     facing_angle_dict_5 = {1: 0, 2: 180, 3: 0, 4: 180}
     map_5 = Map(level_data_5, facing_angle_dict_5)

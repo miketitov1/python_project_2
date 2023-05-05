@@ -13,7 +13,7 @@ class Server:
     def __init__(self):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.port = PORT
-        self.server_ip = socket.gethostbyname_ex(socket.gethostname())[2][1]
+        self.server_ip = SERVER_IP
         self.address = (self.server_ip, self.port)
         self.server.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.bind_server()
